@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('project:server');
+var http = require('http');
+
+
+// 生成项目端口号，process.env.PORT 抓取系统环境变量
+var port = normalizePort(process.env.PORT || '3001');
+app.set('port', port); // 相当于app.listen(port)，没有正式监听
+
+/**
+ * 创建http原生web服务器
+ */
+var server = http.createServer(app);  // createServe(函数|koa实例)
+
+/**
+ * 监听服务器
+ */
+server.listen(port); // 监听端口
+server.on('error', onError); //监听错误
+server.on('listening', onListening); // 监听其他
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+//  随机生成一个端口号
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ *  访问了一些不存在的地址时，处理错误
+ */
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' 端口呗占用了'); // 端口被暂用了
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * 捕获一些其他的响应事件，交由debug第三方模块处理
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
