@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var multer = require('multer')
 var cookieSession = require('cookie-session')
 var logger = require('morgan');
+let cors = require('cors');
 
 var app = express();
 
@@ -81,24 +82,39 @@ app.use('/api/reg', require('./routes/api/reg'));
 
 app.all('/api/*', require('./routes/api/params'));
 app.use('/api/user', require('./routes/api/user'));
-app.use('/api/home', require('./routes/api/home'));
+
+// app.use('/api/home', require('./routes/api/home'));
+
+app.use('/api/list',require('./routes/api/list'))
+
 app.use('/api/follow', require('./routes/api/follow'));
 app.use('/api/column', require('./routes/api/column'));
 
 app.use('/api/lunbo', require('./routes/api/lunbo'));
 // 注册
 
+//短信验证接口
+// app.use('/message/send-code',require('./routes/message/send-code'))
 
 
+app.use(cors({
+  //允许所有前端域名
+  "origin": ["http://127.0.0.1:8054"],  
+  "credentials":true,//允许携带凭证
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE", //被允许的提交方式
+  "allowedHeaders":['Content-Type','Authorization']//被允许的post方式的请求头
+}));
 
 
 
 // 管理端                      路由
 app.use('/admin/', require('./routes/admin/index'));
 app.use('/admin/users', require('./routes/admin/users'));
+app.use('/admin/banner', require('./routes/admin/banner'));
+
 
 // 代理端
-
+// app.use('/proxy/home', require('./routes/proxy/home'));
 // 推送端
 
 
